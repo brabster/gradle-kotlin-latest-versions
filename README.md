@@ -1,0 +1,1 @@
+Example Gradle/Kotlin repo to select latest stable versions of dependencies.

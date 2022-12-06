@@ -12,6 +12,9 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+
+    // Manually added to check for updates
+    id "com.github.ben-manes.versions" version '0.43.0'
 }
 
 repositories {
@@ -39,4 +42,22 @@ dependencies {
 application {
     // Define the main class for the application.
     mainClass = 'app.AppKt'
+}
+
+def isNonStable = { String version ->
+  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it.toUpperCase()) }
+  def regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
+}
+
+configurations.all {
+  resolutionStrategy {
+    componentSelection {
+      all {
+        if (isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)) {
+          reject('not a stable version')
+        }
+      }
+    }
+  }
 }
